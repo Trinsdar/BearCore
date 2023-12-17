@@ -1,10 +1,10 @@
 package bear.bearcore;
 
-import com.example.examplemod.CommonClass;
-import com.example.examplemod.Constants;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.BonemealEvent;
@@ -33,8 +33,15 @@ public class BearCore {
     public void onBonemeal(BonemealEvent event) {
         if(event.getBlock().getBlock() instanceof BonemealableBlock block && !event.getWorld().isClientSide() && event.getPlayer() != null) {
             event.getPlayer().displayClientMessage(new TextComponent("Stop Cheating!"), false);
-            if(block.isValidBonemealTarget(event.getWorld(), event.getPos(), event.getBlock(), false) && !event.getStack().isEmpty()) {
-                event.getStack().shrink(1);
+            ItemStack stack = event.getStack();
+            if(block.isValidBonemealTarget(event.getWorld(), event.getPos(), event.getBlock(), false) && !stack.isEmpty()) {
+                if (stack.isDamageableItem()){
+                    stack.hurtAndBreak(1, event.getPlayer(), p -> {
+                        p.broadcastBreakEvent(EquipmentSlot.MAINHAND);
+                    });
+                } else {
+                    stack.shrink(1);
+                }
             }
         }
         event.setCanceled(true);
