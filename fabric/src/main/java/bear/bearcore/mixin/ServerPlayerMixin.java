@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Unit;
@@ -45,5 +46,15 @@ public abstract class ServerPlayerMixin extends Player {
     @WrapOperation(method = "startSleepInBed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isDay()Z"))
     private boolean wrapSleepCheck(Level instance, Operation<Boolean> original){
         return bearLastSlept > 10000;
+    }
+
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    private void injectAddAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci){
+        compoundTag.putLong("bearLastSlept", bearLastSlept);
+    }
+
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    private void injectReadAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci){
+        bearLastSlept = compoundTag.getLong("bearLastSlept");
     }
 }
