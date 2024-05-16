@@ -8,8 +8,8 @@
         "${mod_author}"
     ],
     "contact": {
-        "homepage": "https://fabricmc.net/",
-        "sources": "https://github.com/FabricMC/fabric-example-mod"
+        "issues": "https://github.com/Trinsdar/BearCore/issues",
+        "sources": "https://github.com/Trinsdar/BearCore"
     },
     "license": "${license}",
     "icon": "assets/${mod_id}/${mod_id}.png",
