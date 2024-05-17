@@ -10,6 +10,6 @@ import org.spongepowered.asm.mixin.injection.At;
 public class ServerLevelMixin {
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setDayTime(J)V"))
     private void wrapDaySet(ServerLevel instance, long l, Operation<Void> original){
-        original.call(instance, l + 1000);
+        original.call(instance, instance.getDayTime() + 1000);
     }
 }
