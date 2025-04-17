@@ -1,7 +1,7 @@
 package bear.bearcore;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -11,7 +11,7 @@ import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.event.entity.player.SleepingTimeCheckEvent;
-import net.minecraftforge.event.world.SleepFinishedTimeEvent;
+import net.minecraftforge.event.level.SleepFinishedTimeEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -31,12 +31,12 @@ public class BearCore {
     }
 
     public void onBonemeal(BonemealEvent event) {
-        if(event.getBlock().getBlock() instanceof BonemealableBlock block && !event.getWorld().isClientSide() && event.getPlayer() != null) {
-            event.getPlayer().displayClientMessage(new TextComponent("Stop Cheating!"), false);
+        if(event.getBlock().getBlock() instanceof BonemealableBlock block && !event.getLevel().isClientSide() && event.getEntity() != null) {
+            event.getEntity().displayClientMessage(Component.literal("Stop Cheating!"), false);
             ItemStack stack = event.getStack();
-            if(block.isValidBonemealTarget(event.getWorld(), event.getPos(), event.getBlock(), false) && !stack.isEmpty()) {
+            if(block.isValidBonemealTarget(event.getLevel(), event.getPos(), event.getBlock(), false) && !stack.isEmpty()) {
                 if (stack.isDamageableItem()){
-                    stack.hurtAndBreak(1, event.getPlayer(), p -> {
+                    stack.hurtAndBreak(1, event.getEntity(), p -> {
                         p.broadcastBreakEvent(EquipmentSlot.MAINHAND);
                     });
                 } else {
@@ -48,30 +48,30 @@ public class BearCore {
     }
 
     public void onTrySleeping(PlayerSleepInBedEvent event) {
-        if(event.getPlayer() == null) return;
-        CompoundTag data = event.getPlayer().getPersistentData();
-        if(event.getPlayer().level.getGameTime() - data.getLong("bear_last_slept") > 10000) {
+        if(event.getEntity() == null) return;
+        CompoundTag data = event.getEntity().getPersistentData();
+        if(event.getEntity().level.getGameTime() - data.getLong("bear_last_slept") > 10000) {
             return;
         }
-        if(!event.getPlayer().level.isClientSide()) event.getPlayer().displayClientMessage(new TextComponent("Get Back to work!"), false);
+        if(!event.getEntity().level.isClientSide()) event.getEntity().displayClientMessage(Component.literal("Get Back to work!"), false);
         event.setResult(Player.BedSleepingProblem.OTHER_PROBLEM);
     }
 
     public void onSleepTime(SleepingTimeCheckEvent event) {
-        if(event.getPlayer() == null) return;
-        CompoundTag data = event.getPlayer().getPersistentData();
-        if(event.getPlayer().level.getGameTime() - data.getLong("bear_last_slept") > 10000) {
+        if(event.getEntity() == null) return;
+        CompoundTag data = event.getEntity().getPersistentData();
+        if(event.getEntity().level.getGameTime() - data.getLong("bear_last_slept") > 10000) {
             event.setResult(Event.Result.ALLOW);
         }
     }
 
     public void onTimeChange(SleepFinishedTimeEvent event) {
-        event.setTimeAddition(event.getWorld().dayTime() + 1000);
+        event.setTimeAddition(event.getLevel().dayTime() + 1000);
     }
 
     public void onWakeUp(PlayerWakeUpEvent event) {
-        if(event.getPlayer() == null) return;
-        event.getPlayer().getPersistentData().putLong("bear_last_slept", event.getPlayer().level.getGameTime());
-        if(!event.getPlayer().level.isClientSide()) event.getPlayer().displayClientMessage(new TextComponent("Get Back to work!"), false);
+        if(event.getEntity() == null) return;
+        event.getEntity().getPersistentData().putLong("bear_last_slept", event.getEntity().level.getGameTime());
+        if(!event.getEntity().level.isClientSide()) event.getEntity().displayClientMessage(Component.literal("Get Back to work!"), false);
     }
 }
