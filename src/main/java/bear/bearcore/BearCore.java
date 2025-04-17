@@ -50,17 +50,17 @@ public class BearCore {
     public void onTrySleeping(PlayerSleepInBedEvent event) {
         if(event.getEntity() == null) return;
         CompoundTag data = event.getEntity().getPersistentData();
-        if(event.getEntity().level.getGameTime() - data.getLong("bear_last_slept") > 10000) {
+        if(event.getEntity().level().getGameTime() - data.getLong("bear_last_slept") > 10000) {
             return;
         }
-        if(!event.getEntity().level.isClientSide()) event.getEntity().displayClientMessage(Component.literal("Get Back to work!"), false);
+        if(!event.getEntity().level().isClientSide()) event.getEntity().displayClientMessage(Component.literal("Get Back to work!"), false);
         event.setResult(Player.BedSleepingProblem.OTHER_PROBLEM);
     }
 
     public void onSleepTime(SleepingTimeCheckEvent event) {
         if(event.getEntity() == null) return;
         CompoundTag data = event.getEntity().getPersistentData();
-        if(event.getEntity().level.getGameTime() - data.getLong("bear_last_slept") > 10000) {
+        if(event.getEntity().level().getGameTime() - data.getLong("bear_last_slept") > 10000) {
             event.setResult(Event.Result.ALLOW);
         }
     }
@@ -71,7 +71,7 @@ public class BearCore {
 
     public void onWakeUp(PlayerWakeUpEvent event) {
         if(event.getEntity() == null) return;
-        event.getEntity().getPersistentData().putLong("bear_last_slept", event.getEntity().level.getGameTime());
-        if(!event.getEntity().level.isClientSide()) event.getEntity().displayClientMessage(Component.literal("Get Back to work!"), false);
+        event.getEntity().getPersistentData().putLong("bear_last_slept", event.getEntity().level().getGameTime());
+        if(!event.getEntity().level().isClientSide()) event.getEntity().displayClientMessage(Component.literal("Get Back to work!"), false);
     }
 }
